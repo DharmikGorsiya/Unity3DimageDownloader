@@ -22,15 +22,23 @@ public class ImageDownloader : MonoBehaviour
         }
     }
 
-    public IEnumerator SetImageAsync(string imgUrl, MaskableGraphic uiElement)
+    public void SetImage(string imgUrl, MaskableGraphic uiElement, bool forceDownload = false)
     {
         if (uiElement != null)
         {
-            yield return StartCoroutine(DownloadAndSetImage(imgUrl, uiElement));
+            StartCoroutine(DownloadAndSetImage(imgUrl, uiElement,forceDownload));
         }
     }
 
-    private IEnumerator DownloadAndSetImage(string imgUrl, MaskableGraphic uiElement)
+    public IEnumerator SetImageAsync(string imgUrl, MaskableGraphic uiElement, bool forceDownload = false)
+    {
+        if (uiElement != null)
+        {
+            yield return StartCoroutine(DownloadAndSetImage(imgUrl, uiElement, forceDownload));
+        }
+    }
+
+    private IEnumerator DownloadAndSetImage(string imgUrl, MaskableGraphic uiElement, bool forceDownload)
     {
         // Extract the directory name from the URL
         string directoryName = ExtractDirectoryNameFromUrl(imgUrl);
@@ -66,7 +74,7 @@ public class ImageDownloader : MonoBehaviour
         string localFilePath = Path.Combine(localDir, fileName);
 
         // Check if the file already exists
-        if (File.Exists(localFilePath))
+        if (!forceDownload && File.Exists(localFilePath))
         {
             // Load the image from local storage
             yield return StartCoroutine(LoadImageFromLocal(localFilePath, uiElement));
